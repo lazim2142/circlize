@@ -91,7 +91,7 @@ foreach my $R (sort { (stat($b))[10] <=> (stat($a))[10] } @Rscript) {
 		next;
 	}
 	if($pdf=~/doodle/) {
-#		next;
+		next;
 	}
 
 	open R, $R;
