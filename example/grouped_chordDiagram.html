@@ -7,10 +7,8 @@
 </head><body><p><img src='grouped_chordDiagram.jpg' style='width:1000px;height:1000px'></p><p><a href='grouped_chordDiagram.pdf'>download PDF</a></p>
 <p id='comment'></p>
 <p id='code'><pre><code>
-
-
 df = read.table(textConnection("
- Brand_from model_from Brand_to Model_to
+ brand_from model_from brand_to model_to
       VOLVO        s80      BMW  5series
         BMW    3series      BMW  3series
       VOLVO        s60    VOLVO      s60
@@ -20,57 +18,33 @@ df = read.table(textConnection("
        AUDI         a5     AUDI       a5
 "), header = TRUE, stringsAsFactors = FALSE)
 
-from = paste(df[[1]], df[[2]], sep = ",")
-to = paste(df[[3]], df[[4]], sep = ",")
-
-mat = matrix(0, nrow = length(unique(from)), ncol = length(unique(to)))
-rownames(mat) = unique(from)
-colnames(mat) = unique(to)
-for(i in seq_along(from)) mat[from[i], to[i]] = 1
+brand = c(structure(df$brand_from, names=df$model_from), structure(df$brand_to,names= df$model_to))
+brand = brand[!duplicated(names(brand))]
+brand = brand[order(brand, names(brand))]
+brand_color = structure(2:4, names = unique(brand))
+model_color = structure(2:8, names = names(brand))
 
 library(circlize)
+gap.degree = do.call("c", lapply(table(brand), function(i) c(rep(2, i-1), 8)))
+circos.par(gap.degree = gap.degree)
 
-circos.par(gap.degree = c(2, 2, 8, 2, 8, 2, 8))
-
-chordDiagram(mat, order = sort(union(from, to)),
+chordDiagram(df[, c(2, 4)], order = names(brand), grid.col = model_color,
     directional = 1, annotationTrack = "grid", preAllocateTracks = list(
-        list(track.height = 0.02),
         list(track.height = 0.02))
 )
 
-circos.trackPlotRegion(track.index = 3, panel.fun = function(x, y) {
+circos.trackPlotRegion(track.index = 2, panel.fun = function(x, y) {
     xlim = get.cell.meta.data("xlim")
     ylim = get.cell.meta.data("ylim")
     sector.index = get.cell.meta.data("sector.index")
-    model = strsplit(sector.index, ",")[[1]][2]
-    circos.text(mean(xlim), mean(ylim), model, col = "white", cex = 0.8, facing = "inside", niceFacing = TRUE)
+    circos.text(mean(xlim), mean(ylim), sector.index, col = "white", cex = 0.6, facing = "inside", niceFacing = TRUE)
 }, bg.border = NA)
 
-all_sectors = get.all.sector.index()
-rou1 = get.cell.meta.data("yplot", sector.index = all_sectors[1], track.index = 2)[1]
-rou2 = get.cell.meta.data("yplot", sector.index = all_sectors[1], track.index = 2)[2]
-
-start.degree = get.cell.meta.data("xplot", sector.index = all_sectors[1], track.index = 2)[1]
-end.degree = get.cell.meta.data("xplot", sector.index = all_sectors[3], track.index = 2)[2]
-draw.sector(start.degree, end.degree, rou1, rou2, clock.wise = TRUE, col = "red", border = NA)
-
-m = reverse.circlize( (start.degree + end.degree)/2, 1, sector.index = all_sectors[1], track.index = 1)
-circos.text(m[1, 1], m[1, 2], "AUDI", cex = 1.2, facing = "inside", adj = c(0.5, 0), niceFacing = TRUE, 
-    sector.index = all_sectors[1], track.index = 1)
-
-start.degree = get.cell.meta.data("xplot", sector.index = all_sectors[4], track.index = 2)[1]
-end.degree   = get.cell.meta.data("xplot", sector.index = all_sectors[5], track.index = 2)[2]
-draw.sector(start.degree, end.degree, rou1, rou2, clock.wise = TRUE, col = "green", border = NA)
-m = reverse.circlize( (start.degree + end.degree)/2, 1, sector.index = all_sectors[1], track.index = 1)
-circos.text(m[1, 1], m[1, 2], "BMW", cex = 1.2, facing = "inside", adj = c(0.5, 0), niceFacing = TRUE, 
-    sector.index = all_sectors[1], track.index = 1)
-
-start.degree = get.cell.meta.data("xplot", sector.index = all_sectors[6], track.index = 2)[1]
-end.degree  = get.cell.meta.data("xplot", sector.index = all_sectors[7], track.index = 2)[2]
-draw.sector(start.degree, end.degree, rou1, rou2, clock.wise = TRUE, col = "blue", border = NA)
-m = reverse.circlize( (start.degree + end.degree)/2, 1, sector.index = all_sectors[1], track.index = 1)
-circos.text(m[1, 1], m[1, 2], "VOLVO", cex = 1.2, facing = "inside", adj = c(0.5, 0), niceFacing = TRUE, 
-    sector.index = all_sectors[1], track.index = 1)
+for(b in unique(brand)) {
+  model = names(brand[brand == b])
+  highlight.sector(sector.index = model, track.index = 1, col = brand_color[b], 
+    text = b, text.vjust = -1, niceFacing = TRUE)
+}
 
 circos.clear()
 </code></pre></p>

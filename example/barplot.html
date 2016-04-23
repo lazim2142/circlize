@@ -28,7 +28,7 @@ bg.border = NA, panel.fun = function(x, y) {
         circos.rect(0, i - 0.45, Percent[i], i + 0.45, col = color[i], border = "white")
     }
     for(i in seq_along(Percent)) {
-        circos.text(xlim[2], i, paste0(Category[i], " - ", Percent[i], "%"), adj = c(1, 0.5)) 
+        circos.text(xlim[2], i, paste0(Category[i], " - ", Percent[i], "%"), adj = c(1, 0.5), facing = "downward") 
     }
 })
 circos.clear()

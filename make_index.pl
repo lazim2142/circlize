@@ -29,7 +29,7 @@ img {
 <table>";
 
 my $i = 1;
-foreach my $R (sort { (stat($b))[10] <=> (stat($a))[10] } @Rscript) {
+foreach my $R (sort { (stat($b))[9] <=> (stat($a))[9] } @Rscript) {
 	print "running $R\n";
 
 	my $pdf = $R;
