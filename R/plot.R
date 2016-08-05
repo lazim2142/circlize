@@ -136,7 +136,7 @@ circos.trackPlotRegion = function(factors = NULL, x = NULL, y = NULL, ylim = NUL
         
    
     le = levels(factors)
-	nlevel = length(le)
+    nlevel = length(le)
     bg.col = recycle.with.levels(bg.col, le)
     bg.border = recycle.with.levels(bg.border, le)
     bg.lty = recycle.with.levels(bg.lty, le)
